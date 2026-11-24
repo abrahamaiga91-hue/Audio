@@ -7,6 +7,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-debug-apk:
     runs-on: ubuntu-latest
@@ -45,3 +48,17 @@ jobs:
         with:
           name: shinobi-music-player-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Publish APK to GitHub Releases
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk ShinobiMusicPlayer-debug.apk
+          gh release delete latest-debug --yes --cleanup-tag || true
+          gh release create latest-debug ShinobiMusicPlayer-debug.apk \
+            --title "Shinobi Music Player (Latest Debug APK)" \
+            --notes "Direct APK download (no ZIP extraction required)." \
+            --target "$GITHUB_SHA"
