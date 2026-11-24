@@ -13,4 +13,4 @@ Offline Android music player built under `com.shinobi.musicplayer` with **Jetpac
 
 ## GitHub Actions CI Build
 
-Pushing to `main` or `master` (or triggering **Actions -> Android CI Build**) automatically builds `app-debug.apk` using JDK 17 and Gradle 8.11.1, and publishes it as a workflow artifact (`shinobi-music-player-debug-apk`).
+Pushing to `main` or `master` (or triggering **Actions -> Android CI Build**) automatically builds `app-debug.apk` using JDK 17 and Gradle 8.9, and publishes it as a workflow artifact (`shinobi-music-player-debug-apk`).

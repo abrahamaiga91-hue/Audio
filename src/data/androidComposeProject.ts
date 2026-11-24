@@ -24,13 +24,21 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android 35 SDK & Accept Licenses
+        run: |
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.11.1'
+          gradle-version: '8.9'
 
       - name: Build Debug APK
-        run: gradle assembleDebug --stacktrace
+        run: gradle assembleDebug --stacktrace --no-daemon
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
@@ -72,7 +80,7 @@ Offline Android music player built under \`com.shinobi.musicplayer\` with **Jetp
 
 ## GitHub Actions CI Build
 
-Pushing to \`main\` or \`master\` (or triggering **Actions -> Android CI Build**) automatically builds \`app-debug.apk\` using JDK 17 and Gradle 8.11.1, and publishes it as a workflow artifact (\`shinobi-music-player-debug-apk\`).
+Pushing to \`main\` or \`master\` (or triggering **Actions -> Android CI Build**) automatically builds \`app-debug.apk\` using JDK 17 and Gradle 8.9, and publishes it as a workflow artifact (\`shinobi-music-player-debug-apk\`).
 `,
 
   'settings.gradle.kts': `pluginManagement {
@@ -178,10 +186,16 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
+    packaging {
+        resources {
+            excludes += listOf("META-INF/DEPENDENCIES", "META-INF/LICENSE*", "META-INF/NOTICE*")
+        }
+    }
 }
 
 dependencies {
-    val media3Version = "1.11.1"
+    val media3Version = "1.5.1"
 
     implementation(libs.androidx.core.ktx)
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
@@ -867,7 +881,7 @@ class AudioRepository(private val context: Context) {
                 val sampleRateFormatted = if (!sampleRateHz.isNullOrEmpty()) {
                     val hz = sampleRateHz.toIntOrNull()
                     if (hz != null) {
-                        if (hz >= 1000) String.format("%.1f kHz", hz / 1000.0) else "\$hz Hz"
+                        if (hz >= 1000) String.format(java.util.Locale.getDefault(), "%.1f kHz", hz / 1000.0) else "\$hz Hz"
                     } else {
                         "Unknown"
                     }

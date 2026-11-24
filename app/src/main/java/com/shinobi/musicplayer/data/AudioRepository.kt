@@ -102,7 +102,7 @@ class AudioRepository(private val context: Context) {
                 val sampleRateFormatted = if (!sampleRateHz.isNullOrEmpty()) {
                     val hz = sampleRateHz.toIntOrNull()
                     if (hz != null) {
-                        if (hz >= 1000) String.format("%.1f kHz", hz / 1000.0) else "$hz Hz"
+                        if (hz >= 1000) String.format(java.util.Locale.getDefault(), "%.1f kHz", hz / 1000.0) else "$hz Hz"
                     } else {
                         "Unknown"
                     }
